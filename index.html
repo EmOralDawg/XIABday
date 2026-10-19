@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday XIA!!! (●'◡'●)</title>
+
+<style>
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #35533b;
+  background: linear-gradient(135deg, #ffdce9, #fff4f8 52%, #e4f5e5);
+}
+
+.scene {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.card {
+  width: min(900px, 94vw);
+  height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Decorations */
+.decor {
+  position: absolute;
+  font-size: 30px;
+  opacity: .65;
+  user-select: none;
+  animation: float 4s ease-in-out infinite;
+}
+.d1 { left: 7%; top: 12%; }
+.d2 { right: 8%; top: 19%; animation-delay: 1s; }
+.d3 { left: 14%; bottom: 13%; animation-delay: 2s; }
+.d4 { right: 14%; bottom: 10%; animation-delay: .5s; }
+
+/* Question */
+.question {
+  text-align: center;
+  z-index: 100;
+  transition: opacity .45s ease, transform .45s ease;
+}
+
+.question h1 {
+  margin: 0 0 8px;
+  color: #d94f83;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+}
+
+.question p {
+  margin: 0 0 22px;
+  font-size: 1.12rem;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 29px;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform .25s ease, font-size .25s ease;
+}
+
+#yesBtn {
+  color: white;
+  background: #76b982;
+  box-shadow: 0 8px 20px rgba(75,130,83,.25);
+}
+
+#noBtn {
+  color: #d94f83;
+  background: white;
+  border: 2px solid #f2a8c4;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-20px);
+}
+
+/* Envelope area */
+.envelope-wrap {
+  position: relative;
+  width: min(650px, 88vw);
+  height: 390px;
+  margin-top: 24px;
+  overflow: hidden;
+}
+
+/* The complete paper. It has NO scrollbar. */
+.letter {
+  position: absolute;
+  left: 7%;
+  bottom: 0;
+  width: 86%;
+  min-height: 520px;
+  padding: 25px 34px;
+  background: #fffdf8;
+  border-radius: 11px;
+  box-shadow: 0 10px 28px rgba(72,68,60,.18);
+  overflow: visible;
+
+  /* Hidden inside the closed envelope */
+  transform: translateY(520px);
+  transition:
+    transform 1.15s cubic-bezier(.18,.82,.2,1),
+    opacity .25s ease;
+  z-index: 2;
+
+  /* Absolutely invisible while the envelope is closed. */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.letter h2 {
+  margin: 0 0 12px;
+  text-align: center;
+  color: #d94f83;
+  font-size: 1.9rem;
+}
+
+.letter p {
+  margin: 0;
+  font-size: .94rem;
+  line-height: 1.48;
+  white-space: pre-line;
+}
+
+.signature {
+  margin-top: 18px;
+  text-align: right;
+  color: #579764;
+  font-weight: bold;
+}
+
+/* Closed envelope */
+.envelope {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 170px;
+  border-radius: 0 0 18px 18px;
+  overflow: hidden;
+  background: #efa0bd;
+  box-shadow: 0 18px 45px rgba(102,73,78,.20);
+  z-index: 10;
+}
+
+.envelope-back {
+  position: absolute;
+  inset: 0;
+  background: #f2a3c0;
+  z-index: 1;
+}
+
+.fold-left,
+.fold-right {
+  position: absolute;
+  bottom: 0;
+  width: 50%;
+  height: 125px;
+  z-index: 3;
+}
+
+.fold-left {
+  left: 0;
+  background: #e993b5;
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+.fold-right {
+  right: 0;
+  background: #f3a9c4;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 105px;
+  background: #ec96b6;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  z-index: 5;
+}
+
+.open-base {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 58px;
+  background: #efa0bd;
+  border-radius: 0 0 18px 18px;
+  z-index: 1;
+}
+
+/* Opened: the whole composition is fixed to the viewport.
+   This prevents ANY page scrolling and centers the paper. */
+.opened {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: min(650px, 88vw);
+  height: 520px;
+  margin: 0;
+  transform: translate(-50%, -50%);
+  overflow: visible;
+  z-index: 500;
+}
+
+.opened .letter {
+  transform: translateY(0);
+  z-index: 30;
+
+  /* Reveal only after YES. */
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.opened .envelope {
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+}
+
+.opened .envelope-back,
+.opened .fold-left,
+.opened .fold-right,
+.opened .flap {
+  display: none;
+}
+
+.opened .open-base {
+  z-index: 5;
+}
+
+.hint {
+  position: absolute;
+  bottom: 3px;
+  z-index: 200;
+  color: #67816c;
+  font-size: .82rem;
+  opacity: .8;
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  top: -25px;
+  width: 9px;
+  height: 14px;
+  z-index: 1000;
+  pointer-events: none;
+  animation: confettiFall linear forwards;
+}
+
+.confetti.circle {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translate3d(0, -30px, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift), 110vh, 0) rotate(var(--spin));
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-13px) rotate(5deg); }
+}
+
+/* Phone */
+@media (max-width: 600px) {
+  .question h1 { font-size: 2rem; }
+  .question p { font-size: 1rem; }
+
+  .envelope-wrap {
+    width: 92vw;
+    height: 330px;
+    margin-top: 20px;
+  }
+
+  .letter {
+    left: 4%;
+    width: 92%;
+    min-height: 430px;
+    padding: 20px;
+    transform: translateY(430px);
+  }
+
+  .letter h2 { font-size: 1.65rem; }
+
+  .letter p {
+    font-size: .88rem;
+    line-height: 1.42;
+  }
+
+  .envelope {
+    height: 135px;
+  }
+
+  .fold-left,
+  .fold-right {
+    height: 100px;
+  }
+
+  .flap {
+    height: 85px;
+  }
+
+  .open-base {
+    height: 45px;
+  }
+
+  .opened {
+    width: 92vw;
+    height: 430px;
+  }
+
+  .hint { display: none; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="scene">
+
+  <div class="decor d1">🌸</div>
+  <div class="decor d2">🍀</div>
+  <div class="decor d3">💚</div>
+  <div class="decor d4">🌷</div>
+
+  <main class="card">
+
+    <section class="question" id="question">
+      <h1>It's your Birthday today!! 🎂</h1>
+      <p>Would you like to read a little birthday message?</p>
+
+      <div class="buttons">
+        <button id="yesBtn">Yes 💚</button>
+        <button id="noBtn">No 🌸</button>
+      </div>
+    </section>
+
+    <div class="envelope-wrap" id="envelopeWrap">
+
+      <!-- LETTER -->
+      <article class="letter">
+        <h2>Happy Birthday! (●'◡'●)</h2>
+
+        <p>
+To you, the most lovely, elegant, and hardworking person I know,
+
+Happy Birthday, XIA!. You've been having a rough week and I hope this message makes YOUR day a little brighter than yesterday ^^. 
+
+You deserve a day filled with joy, laughter, and all your favorite things. I am happy and PROUD of you palagi when you accomplish things :>> Galingan mo lang palagi ha? Okay lang din mapagod. You have so much ahead of you and I know that there are times when you feel like you're carrying the weight of the world on your shoulders, but I want you to know that you're not alone.
+
+You are strong, capable, and loved. Please know that you are appreciated and valued palagi. I love listening to your kwentos and complains kaya kwento ka lang ha? I know you're doing well and always remember na I believe in you!
+
+Be yourself lang, okay? You're perfect just the way you are. Wag ka magbabago!!
+
+Thank you for being you. 
+
+I hope you have the loveliest birthday ever.
+
+Happy birthday! 🎂🌸
+        </p>
+
+        <div class="signature">
+          — From the person who buries u in sand when you are AFK 
+        </div>
+      </article>
+
+      <!-- ENVELOPE -->
+      <div class="envelope" id="envelope">
+
+        <div class="envelope-back"></div>
+        <div class="fold-left"></div>
+        <div class="fold-right"></div>
+        <div class="flap"></div>
+
+        <!-- This is the ONLY envelope piece left when opened -->
+        <div class="open-base"></div>
+
+      </div>
+
+    </div>
+
+    <div class="hint">
+      P.S. You can't escape the birthday message forever 😌
+    </div>
+
+  </main>
+</div>
+
+<script>
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const envelope = document.getElementById("envelope");
+const envelopeWrap = document.getElementById("envelopeWrap");
+const question = document.getElementById("question");
+
+let noClicks = 0;
+let opened = false;
+
+/* NO makes YES bigger — and runs away from the cursor XD */
+
+function moveNoButton() {
+  const rect = noBtn.getBoundingClientRect();
+
+  const padding = 12;
+  const maxX = window.innerWidth - rect.width - padding;
+  const maxY = window.innerHeight - rect.height - padding;
+
+  // Keep it away from the cursor by choosing a random point,
+  // then rejecting points that are too close.
+  let x, y;
+  let attempts = 0;
+
+  do {
+    x = padding + Math.random() * Math.max(0, maxX - padding);
+    y = padding + Math.random() * Math.max(0, maxY - padding);
+    attempts++;
+  } while (
+    Math.hypot(
+      x + rect.width / 2 - window._mouseX,
+      y + rect.height / 2 - window._mouseY
+    ) < 150 && attempts < 30
+  );
+
+  noBtn.style.position = "fixed";
+  noBtn.style.left = `${x}px`;
+  noBtn.style.top = `${y}px`;
+  noBtn.style.transition = "left 0.35s ease, top 0.35s ease, transform 0.2s ease";
+  noBtn.style.zIndex = "900";
+}
+
+window._mouseX = window.innerWidth / 2;
+window._mouseY = window.innerHeight / 2;
+
+document.addEventListener("mousemove", (e) => {
+  window._mouseX = e.clientX;
+  window._mouseY = e.clientY;
+
+  if (noClicks < 8) {
+    const rect = noBtn.getBoundingClientRect();
+
+    // Start dodging when the cursor gets close.
+    const distance = Math.hypot(
+      e.clientX - (rect.left + rect.width / 2),
+      e.clientY - (rect.top + rect.height / 2)
+    );
+
+    if (distance < 105) {
+      moveNoButton();
+    }
+  }
+});
+
+noBtn.addEventListener("click", () => {
+  noClicks++;
+
+  const yesScale = 1 + noClicks * 0.22;
+  yesBtn.style.transform = `scale(${yesScale})`;
+  yesBtn.style.fontSize = `${1 + noClicks * 0.08}rem`;
+
+  const noScale = Math.max(.45, 1 - noClicks * .08);
+  noBtn.style.transform = `scale(${noScale})`;
+
+  if (noClicks >= 5) {
+    noBtn.textContent = "Okay... yes? 🥺";
+  }
+
+  if (noClicks >= 8) {
+    noBtn.style.opacity = "0";
+    noBtn.style.pointerEvents = "none";
+  } else {
+    moveNoButton();
+  }
+});
+
+/* CONFETTI */
+function launchConfetti() {
+  const pieces = 90;
+  const colors = [
+    "#d94f83",
+    "#76b982",
+    "#f4c95d",
+    "#9b78c9",
+    "#f29fbc"
+  ];
+
+  for (let i = 0; i < pieces; i++) {
+    const piece = document.createElement("div");
+
+    piece.className =
+      "confetti" + (Math.random() > .72 ? " circle" : "");
+
+    piece.style.left = Math.random() * 100 + "vw";
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+    piece.style.animationDuration =
+      (2.7 + Math.random() * 2.5) + "s";
+
+    piece.style.animationDelay =
+      (Math.random() * .55) + "s";
+
+    piece.style.setProperty(
+      "--drift",
+      ((Math.random() - .5) * 350) + "px"
+    );
+
+    piece.style.setProperty(
+      "--spin",
+      ((Math.random() > .5 ? 1 : -1) *
+        (360 + Math.random() * 720)) + "deg"
+    );
+
+    document.body.appendChild(piece);
+
+    setTimeout(() => piece.remove(), 6000);
+  }
+}
+
+/* YES */
+yesBtn.addEventListener("click", () => {
+  if (opened) return;
+  opened = true;
+
+  question.classList.add("hidden");
+  envelopeWrap.classList.add("opened");
+
+  launchConfetti();
+
+  document.body.style.overflow = "hidden";
+});
+</script>
+
+</body>
+</html>
